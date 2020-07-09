@@ -47,10 +47,12 @@ def test_setup():
 def test_production():
     logger = logging.getLogger('Setup-Production')
     print()
-    server = socketserver.TCPServer((server_ips[server_id], port), LatencyRequestHandler)
+    server = socketserver.TCPServer(('localhost', port), LatencyRequestHandler)
     t = threading.Thread(target=server.serve_forever)
     t.setDaemon(True)
     t.start()
+
+    time.sleep(30)
 
     clients = []
     for i in range(5):
