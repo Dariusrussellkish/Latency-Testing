@@ -2,6 +2,8 @@ import json
 import socket
 import time
 import logging
+import random
+from latencytesting.parameters import PARAMS
 
 logging.basicConfig(level=logging.DEBUG,
                     format='%(name)s: %(message)s',
@@ -14,7 +16,11 @@ def encode_and_timestamp(message):
 
 
 class LatencyClient:
-    def __init__(self, server_addresses, port, c_id, n_messages=1000, delta=0.5):
+    def __init__(self, server_addresses, port, c_id,
+                 n_messages=1000,
+                 delta=0.5,
+                 max_random_latency=0.002,
+                 message_size=PARAMS):
         self.connections = []
         self.server_addresses = server_addresses
         self.port = port
@@ -22,6 +28,8 @@ class LatencyClient:
         self.n_messages = n_messages
         self.delta = delta
         self.logger = logging.getLogger('LatencyClient')
+        self.max_random_latency = max_random_latency
+        self.message_size = message_size
 
     def make_connections(self, server_addresses, port):
         sockets = []
@@ -41,7 +49,10 @@ class LatencyClient:
 
     def broadcast(self, message: dict):
         for connection in self.connections:
-            m = encode_and_timestamp(message).encode()
+            m = encode_and_timestamp(message).rjust(self.message_size.MESSAGE_SIZE).encode('utf-8')
+            assert len(m) == self.message_size.MESSAGE_SIZE
+            delay = random.uniform(0., self.max_random_latency)
+            time.sleep(delay)
             connection.send(m)
 
     def start(self):
