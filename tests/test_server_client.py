@@ -6,7 +6,7 @@ import threading
 import logging
 import time
 
-server_ips = ['127.0.0.1', '127.0.0.2', '127.0.0.3']
+server_ips = ['128.105.145.214', '128.105.145.218', '128.105.145.208']
 port = 8090
 server_id = 0
 
